@@ -1,5 +1,5 @@
 if (typeof window !== 'undefined') {
-	module.exports = require('./renderer');
+	module.exports = require('./src/renderer');
 } else {
-	module.exports = eval('require')('./main');
+	module.exports = eval('require')('./src/main');
 }
