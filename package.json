@@ -1,0 +1,38 @@
+{
+  "name": "electron-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lemonce/electron-service.git"
+  },
+  "keywords": [
+    "electron",
+    "service",
+    "ipc",
+    "logger",
+    "both",
+    "process",
+    "main",
+    "process",
+    "renderer",
+    "process"
+  ],
+  "author": "Chaos Lee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/lemonce/electron-service/issues"
+  },
+  "homepage": "https://github.com/lemonce/electron-service#readme",
+  "dependencies": {
+    "fs-extra": "^2.0.0",
+    "winston": "^2.3.0"
+  },
+  "devDependencies": {
+    "electron": "^1.4.14"
+  }
+}
