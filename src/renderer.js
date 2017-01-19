@@ -38,18 +38,12 @@ const call = function (uri, ...args) {
 
 			// Register to calling pool by token
 			proxyCallingPool[$tokenId] = function ({err, ret}) {
+				clearProxyCalling($tokenId);
 				if (err) {
 					return reject(err);
 				}
 				return resolve(ret);
 			};
-		}).then(ret => {
-			return {ret};
-		}, err => {
-			throw {err};
-		}).then(data => {
-			clearProxyCalling($tokenId);
-			return {ret: data.ret, err: data.ret};
 		})
 	]);
 };
