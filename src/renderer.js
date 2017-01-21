@@ -67,6 +67,7 @@ const app = module.exports = {
 		call('Application.log', level, ...message);
 	}
 };
+app.emitter = app;
 app.initPromise = call('Application.$registerWebContents', localWebContentsId);
 
 ipcRenderer.on('application-event', (event, eventType, ...args) => {

@@ -76,6 +76,8 @@ const main = module.exports = {
 	}
 };
 
+main.emitter = main;
+
 /**
  * App Service
  */
