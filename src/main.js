@@ -7,6 +7,10 @@ const logger = require('./logger');
  * Service
  */
 const serviceManagement = {};
+function noLog(method) {
+	method.noLog = true;
+	return method;
+}
 const service = function (id, constructor) {
 	const service = serviceManagement[id];
 	if (constructor) {
@@ -15,7 +19,8 @@ const service = function (id, constructor) {
 		}
 		
 		if (typeof constructor === 'function') {
-			return serviceManagement[id] = new constructor();
+			const $service = serviceManagement[id] = new constructor(noLog);
+			return $service;
 		}
 
 		throw new Error(`Invalid constructor for defination of Service ${id}. Excepted a function.`);
@@ -29,22 +34,32 @@ const service = function (id, constructor) {
 };
 
 ipcMain.on('application-request', (event, {id, method, args}, $tokenId, webContentsId) => {
-	logger.log('info', '[MAIN.Call]: Sender=%d Service=%s Method=%s Args=%j Token=%d',
-		webContentsId, id, method, args, $tokenId);
 
 	Promise.resolve().then(() => {
 		const $service = service(id);
+		let noLog = false;
+
+		if (!$service) {
+			throw new Error(`Service ${id} has not been registed.`);
+		}
+		noLog = $service.noLog;
 
 		if (!$service[method]) {
 			throw new Error(`Method ${method} of Service ${id} is not defined.`);
 		}
 
+		noLog = $service[method].noLog;
+		if (!noLog) {
+			logger.log('info', '[<<<<<]: Sender=%d Service=%s Method=%s Args=%j Token=%d',
+				webContentsId, id, method, args, $tokenId);
+		}
+
 		return $service[method](...args);
 	}).then(ret => {
-		logger.log('info', '[MAIN.Return] Return=%j', {ret});
+		logger.log('info', '[>>>>>] Return=%j', {ret});
 		return {ret};
 	}, err => {
-		logger.log('error', '[MAIN.Error] Exception=%s', err.toString());
+		logger.log('error', '[ERROR] Exception=%s', err.toString());
 		return {
 			err: err.toString()
 		};
@@ -64,7 +79,7 @@ const main = module.exports = {
 		main.$rendererEmitter.removeListener(event, listener);
 	},
 	emit(eventType, ...args) {
-		logger.log('info', '[APP.Emit]: Event=%s Args=%j', eventType, args);
+		logger.log('info', '[EVENT]: Event=%s', eventType);
 		main.$mainEmitter.emit(eventType, ...args);
 		for(let id in main.$activeWebContents) {
 			const webContents = main.$activeWebContents[id];
@@ -81,7 +96,7 @@ main.emitter = main;
 /**
  * App Service
  */
-service('Application', function () {
+service('Application', function (noLog) {
 	this.$registerWebContents = function (id) {
 		const $webContents =
 			main.$activeWebContents[id] =
@@ -93,11 +108,11 @@ service('Application', function () {
 		return true;
 	};
 
-	this.$emit = function (eventType, ...args) {
+	this.$emit = noLog(function (eventType, ...args) {
 		main.emit(eventType, ...args);
-	};
+	});
 
-	this.log = function (level, ...message) {
+	this.log = noLog(function (level, ...message) {
 		main.log(level, ...message);
-	};
+	});
 });
