@@ -3,6 +3,7 @@ const EventEmitter = require('events');
 const {ipcMain, webContents} = require('electron');
 const logger = require('./logger');
 
+const SAFE_IPC_INTERVAL = 50;
 /**
  * Service
  */
@@ -63,9 +64,9 @@ ipcMain.on('application-request', (event, {id, method, args}, $tokenId, webConte
 		return {
 			err: err.toString()
 		};
-	}).then(response => {
+	}).then(response => setTimeout(() => {
 		event.sender.send('application-response', response, $tokenId);
-	});
+	}, SAFE_IPC_INTERVAL));
 });
 
 const main = module.exports = {
