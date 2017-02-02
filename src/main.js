@@ -57,7 +57,9 @@ ipcMain.on('application-request', (event, {id, method, args}, $tokenId, webConte
 
 		return $service[method](...args);
 	}).then(ret => {
-		logger.log('info', '[>>>>>] Return=%j', {ret});
+		if (!noLog) {
+			logger.log('info', '[>>>>>] Return=%j', {ret});
+		}
 		return {ret};
 	}, err => {
 		logger.log('error', '[ERROR] Exception=%s', err.toString());
