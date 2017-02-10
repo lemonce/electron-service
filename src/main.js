@@ -67,7 +67,8 @@ ipcMain.on('application-request', (event, {id, method, args}, $tokenId, webConte
 			err: err.toString()
 		};
 	}).then(response => setTimeout(() => {
-		event.sender.send('application-response', response, $tokenId);
+		const {sender} = event;
+		!sender.isDestroyed() && sender.send('application-response', response, $tokenId);
 	}, SAFE_IPC_INTERVAL));
 });
 
